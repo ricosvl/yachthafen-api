@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Mvc;
 using api.Data;
 using api.Models;
 using api.Interfaces;
+using api.Services;
+using System.Security.Claims;
 
 namespace api.Controllers
 {
@@ -17,11 +19,13 @@ namespace api.Controllers
 
         private readonly UserDbContext _userDbContext;
         private readonly IAuthService _authRepository;
+        private readonly JwtServices _jwtServices;
 
-        public AuthController(UserDbContext userDbContext, IAuthService authRepository)
+        public AuthController(UserDbContext userDbContext, IAuthService authRepository, JwtServices jwtServices)
         {
             _userDbContext = userDbContext;
             _authRepository = authRepository;
+            _jwtServices = jwtServices;
         }
 
 
@@ -36,7 +40,18 @@ namespace api.Controllers
         public async Task<IActionResult> login(fillabileFields user)
         {
             var loginUser = await _authRepository.login(user.email, user.password);
-            return Ok(loginUser);
+
+            var token = _jwtServices.generateToken(loginUser);
+            return Ok(new { token, loginUser });
+        }
+
+        [HttpGet("me")]
+        public async Task<IActionResult> getLoggedInUser() 
+        {
+
+            var loggedInUser = HttpContext.User;
+
+            return Ok(loggedInUser);
         }
     }
 }

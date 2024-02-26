@@ -4,6 +4,8 @@ using Microsoft.EntityFrameworkCore;
 using Pomelo.EntityFrameworkCore.MySql;
 using api.Interfaces;
 using api.Repositorys;
+using api.Services;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -22,7 +24,20 @@ builder.Services.AddScoped<IUserService, UserRepository>();
 builder.Services.AddScoped<IAuthService, AuthRepository>();
 
 
+builder.Services.AddSingleton<JwtServices>(provider =>
+{
+    var secretKey = "yachthafenkey";
+    var issuer = "yachthafenissuer";
 
+    return new JwtServices(secretKey, issuer);
+});
+
+static string Base64UrlDecode(string base64Url)
+{
+    string padded = base64Url.PadRight(base64Url.Length + (4 - base64Url.Length % 4) % 4, '=');
+    byte[] base64Bytes = Convert.FromBase64String(padded.Replace('-', '+').Replace('_', '/'));
+    return Encoding.UTF8.GetString(base64Bytes);
+}
 
 
 var app = builder.Build();
