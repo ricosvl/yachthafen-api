@@ -21,9 +21,11 @@ builder.Services.AddSwaggerGen();
 var connectionString = builder.Configuration.GetConnectionString("DbConnection");
 
 builder.Services.AddDbContext<UserDbContext>(options => options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
+builder.Services.AddDbContext<BuchungDbContext>(options => options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
 
 builder.Services.AddScoped<IUserService, UserRepository>();
 builder.Services.AddScoped<IAuthService, AuthRepository>();
+builder.Services.AddScoped<IBuchungService, BuchungRepository>();
 
 builder.Services.AddSingleton<JwtServices>(provider =>
 {
