@@ -6,6 +6,8 @@ using api.Interfaces;
 using api.Repositorys;
 using api.Services;
 using System.Text;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -23,7 +25,6 @@ builder.Services.AddDbContext<UserDbContext>(options => options.UseMySql(connect
 builder.Services.AddScoped<IUserService, UserRepository>();
 builder.Services.AddScoped<IAuthService, AuthRepository>();
 
-
 builder.Services.AddSingleton<JwtServices>(provider =>
 {
     var secretKey = "yachthafenkey";
@@ -38,7 +39,6 @@ static string Base64UrlDecode(string base64Url)
     byte[] base64Bytes = Convert.FromBase64String(padded.Replace('-', '+').Replace('_', '/'));
     return Encoding.UTF8.GetString(base64Bytes);
 }
-
 
 var app = builder.Build();
 

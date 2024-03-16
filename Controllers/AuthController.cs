@@ -9,6 +9,9 @@ using api.Models;
 using api.Interfaces;
 using api.Services;
 using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
+using System.IdentityModel.Tokens.Jwt;
+using System.Text;
 
 namespace api.Controllers
 {
@@ -20,12 +23,14 @@ namespace api.Controllers
         private readonly UserDbContext _userDbContext;
         private readonly IAuthService _authRepository;
         private readonly JwtServices _jwtServices;
+        private readonly IConfiguration _config;
 
-        public AuthController(UserDbContext userDbContext, IAuthService authRepository, JwtServices jwtServices)
+        public AuthController(UserDbContext userDbContext, IAuthService authRepository, JwtServices jwtServices, IConfiguration config)
         {
             _userDbContext = userDbContext;
             _authRepository = authRepository;
             _jwtServices = jwtServices;
+            _config = config;
         }
 
 
@@ -42,16 +47,27 @@ namespace api.Controllers
             var loginUser = await _authRepository.login(user.email, user.password);
 
             var token = _jwtServices.generateToken(loginUser);
+
+
             return Ok(new { token, loginUser });
         }
 
-        [HttpGet("me")]
-        public async Task<IActionResult> getLoggedInUser() 
+        [HttpPost("refresh")]
+        public async Task<IActionResult> refreshToken([FromBody] RefreshTokenRequestModel model)
         {
 
-            var loggedInUser = HttpContext.User;
+            var refreshToken = _jwtServices.generateRefreshToken();
 
-            return Ok(loggedInUser);
+            return Ok(new { RefreshToken = refreshToken });
         }
+
+
     }
+
+   
+}
+
+public class RefreshTokenRequestModel
+{
+    public string RefreshToken { get; set; }
 }

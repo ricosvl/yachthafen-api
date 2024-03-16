@@ -3,6 +3,7 @@ using api.Data;
 using api.Interfaces;
 using api.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity;
 
 namespace api.Repositorys
 {
@@ -29,6 +30,9 @@ namespace api.Repositorys
                 throw new BadHttpRequestException("Email bereits vorhanden");
             }
 
+            var passwordHasher = new PasswordHasher<User>();
+            user.password = passwordHasher.HashPassword(user, user.password);
+
             var createdUser = await _userDbContext.users.AddAsync(user);
             await _userDbContext.SaveChangesAsync();
             return createdUser.Entity;
@@ -52,15 +56,23 @@ namespace api.Repositorys
                 throw new BadHttpRequestException("Email ist nicht vorhanden");
             }
 
-            var getPassword = await checkPassword(password);
-
-            if (getPassword == null)
+       
+            if (!VerifyPassword(checkmail.password, password))
             {
-                throw new BadHttpRequestException("Passwörter stimmen nicht miteinander überein");
+                // Das eingegebene Passwort stimmt nicht mit dem Passwort in der Datenbank überein
+                throw new BadHttpRequestException("Ungültige Anmeldeinformationen");
             }
-                
+
+
 
             return checkmail;
+        }
+
+        private bool VerifyPassword(string hashedPassword, string providedPassword)
+        {
+            var passwordHasher = new PasswordHasher<User>();
+            var result = passwordHasher.VerifyHashedPassword(null, hashedPassword, providedPassword);
+            return result == PasswordVerificationResult.Success;
         }
 
     }
