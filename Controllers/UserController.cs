@@ -74,7 +74,7 @@ namespace api.Controllers
             }
         }
 
-        [HttpGet("string")]
+        [HttpGet("getByEmail")]
         public async Task<IActionResult> getUserByEmail(string email)
         {
             try

@@ -48,5 +48,21 @@ namespace api.Controllers
             }
         }
 
+        [HttpDelete("id")]
+        public async Task<IActionResult> deleteUSer(int id)
+        {
+            try
+            {
+                var booking = await _buchungRepository.deleteBooking(id);
+                return Ok(booking);
+
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                     "Error retrieving data from the database");
+            }
+        }
+
     }
 }

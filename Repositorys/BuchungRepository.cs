@@ -35,6 +35,21 @@ namespace api.Repositorys
 
         }
 
+        public async Task<Buchung> deleteBooking(int id)
+        {
+            var res = await _buchungRepository.buchung.FirstOrDefaultAsync(e => e.id == id);
+
+
+            if (res != null)
+            {
+                _buchungRepository.buchung.Remove(res);
+                await _buchungRepository.SaveChangesAsync();
+                return res;
+            }
+
+            return null;
+        }
+
         public static string GenerateRandomCode(int lenght)
         {
 
