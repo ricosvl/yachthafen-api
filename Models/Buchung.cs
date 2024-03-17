@@ -16,7 +16,9 @@ namespace api.Models
 		public DateTime endDate { get; set; }
 
 		public string anliegePlatz { get; set; }
-		
-	}
+
+        public string verifyCode { get; set; }
+
+    }
 }
 
